@@ -1,11 +1,12 @@
 package com.example.pokedex
-import com.example.pokedex.model.Sprites
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.appcompat.widget.SearchView
 import com.example.pokedex.adapter.PokemonAdapter
 import com.example.pokedex.data.PokemonRepository
+import com.example.pokedex.model.Sprites
 
 class MainActivity : AppCompatActivity() {
     private lateinit var pokemonAdapter: PokemonAdapter
@@ -18,8 +19,9 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         val recyclerView: RecyclerView = findViewById(R.id.recyclerViewPokemonList)
-        recyclerView.layoutManager = LinearLayoutManager(this)
+        val searchView: SearchView = findViewById(R.id.searchView)
 
+        recyclerView.layoutManager = LinearLayoutManager(this)
         pokemonAdapter = PokemonAdapter(mutableListOf())
         recyclerView.adapter = pokemonAdapter
 
@@ -37,9 +39,20 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
+            override fun onQueryTextSubmit(query: String?): Boolean {
+
+                return false
+            }
+
+            override fun onQueryTextChange(newText: String?): Boolean {
+                pokemonAdapter.filter.filter(newText)
+                return false
+            }
+        })
+
         loadMorePokemons()
     }
-
     private fun loadMorePokemons() {
         PokemonRepository.getPokemonList(limit, offset) { pokemonList ->
             pokemonList?.let {
@@ -59,4 +72,3 @@ class MainActivity : AppCompatActivity() {
         }
     }
 }
-
