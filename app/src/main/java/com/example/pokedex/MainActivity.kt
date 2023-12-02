@@ -1,11 +1,16 @@
 package com.example.pokedex
 import android.os.Bundle
+import android.widget.ImageView
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.appcompat.widget.SearchView
+import com.bumptech.glide.Glide
 import com.example.pokedex.adapter.PokemonAdapter
 import com.example.pokedex.data.PokemonRepository
+import com.example.pokedex.model.Pokemon
 import com.example.pokedex.model.Sprites
 
 class MainActivity : AppCompatActivity() {
@@ -22,7 +27,9 @@ class MainActivity : AppCompatActivity() {
         val searchView: SearchView = findViewById(R.id.searchView)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
-        pokemonAdapter = PokemonAdapter(mutableListOf())
+        pokemonAdapter = PokemonAdapter(mutableListOf()){
+            pokemon -> showPokemonDetailsDialog(pokemon)
+        }
         recyclerView.adapter = pokemonAdapter
 
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
@@ -53,6 +60,25 @@ class MainActivity : AppCompatActivity() {
 
         loadMorePokemons()
     }
+
+    private fun showPokemonDetailsDialog(pokemon: Pokemon) {
+
+        val dialogView = layoutInflater.inflate(R.layout.pokemon_details, null)
+        val imageView: ImageView = dialogView.findViewById(R.id.dialog_pokemon_image)
+        val nameTextView: TextView = dialogView.findViewById(R.id.dialog_pokemon_name)
+
+
+        nameTextView.text = pokemon.name
+
+        Glide.with(this).load(pokemon.sprites.front_default).into(imageView)
+
+        // Crea y muestra el diálogo
+        AlertDialog.Builder(this)
+            .setView(dialogView)
+            .setPositiveButton("Cerrar") { dialog, _ -> dialog.dismiss() }
+            .show()
+    }
+
     private fun loadMorePokemons() {
         PokemonRepository.getPokemonList(limit, offset) { pokemonList ->
             pokemonList?.let {

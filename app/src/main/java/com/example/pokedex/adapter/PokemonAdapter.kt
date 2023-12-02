@@ -3,6 +3,7 @@ package com.example.pokedex.adapter
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ExpandableListView.OnChildClickListener
 import android.widget.Filter
 import android.widget.Filterable
 import android.widget.ImageView
@@ -13,7 +14,9 @@ import com.example.pokedex.R
 import com.example.pokedex.model.Pokemon
 import java.util.Locale
 
-class PokemonAdapter(private val pokemonList: MutableList<Pokemon>) :
+class PokemonAdapter(
+    private val pokemonList: MutableList<Pokemon>,
+    private val clickListener: (Pokemon) -> Unit) :
     RecyclerView.Adapter<PokemonAdapter.PokemonViewHolder>(), Filterable {
 
     var pokemonFilterList = mutableListOf<Pokemon>()
@@ -37,6 +40,10 @@ class PokemonAdapter(private val pokemonList: MutableList<Pokemon>) :
             .placeholder(R.drawable.placeholder_image)
             .error(R.drawable.error)
             .into(holder.imageViewSprite)
+
+        holder.itemView.setOnClickListener {
+            clickListener(pokemon)
+        }
     }
 
     override fun getItemCount() = pokemonFilterList.size

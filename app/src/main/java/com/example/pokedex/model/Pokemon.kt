@@ -9,6 +9,3 @@ data class Pokemon(
 data class Sprites(
     val front_default: String?
 )
-
-
-
