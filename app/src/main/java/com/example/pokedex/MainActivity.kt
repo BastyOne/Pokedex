@@ -1,5 +1,8 @@
 package com.example.pokedex
+
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
@@ -11,13 +14,22 @@ import com.bumptech.glide.Glide
 import com.example.pokedex.adapter.PokemonAdapter
 import com.example.pokedex.data.PokemonRepository
 import com.example.pokedex.model.Pokemon
-import com.example.pokedex.model.Sprites
+import com.example.pokedex.util.ClockModule
+
 
 class MainActivity : AppCompatActivity() {
     private lateinit var pokemonAdapter: PokemonAdapter
     private var isLoading = false
     private var offset = 0
     private val limit = 20
+    private lateinit var clockTextView: TextView
+    private val handler = Handler(Looper.getMainLooper())
+    private val updateTimeTask = object : Runnable {
+        override fun run() {
+            clockTextView.text = ClockModule.getCurrentTime()
+            handler.postDelayed(this, 60000)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -25,6 +37,11 @@ class MainActivity : AppCompatActivity() {
 
         val recyclerView: RecyclerView = findViewById(R.id.recyclerViewPokemonList)
         val searchView: SearchView = findViewById(R.id.searchView)
+
+
+
+        clockTextView = findViewById(R.id.tvClock)
+        handler.post(updateTimeTask)
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         pokemonAdapter = PokemonAdapter(mutableListOf()){
@@ -59,6 +76,11 @@ class MainActivity : AppCompatActivity() {
         })
 
         loadMorePokemons()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        handler.removeCallbacks(updateTimeTask)
     }
 
     private fun showPokemonDetailsDialog(pokemon: Pokemon) {
