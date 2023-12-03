@@ -1,6 +1,9 @@
 <resources>
     <string name="app_name">Pokedex</string>
     <string name="pokemon_sprite">Descripción del sprite del Pokémon</string>
-    <string name="height_format">Altura: %1$f m</string>
-    <string name="weight_format">Peso: %1$f kg</string>
+    <string name="pokemon_height">Altura: %1$d dm</string>
+    <string name="pokemon_weight">Peso: %1$d hg</string>
+    <string name="pokemon_types">Tipos: %1$s</string>
+    <string name="pokemon_abilities">Habilidades: %1$s</string>
+
 </resources>

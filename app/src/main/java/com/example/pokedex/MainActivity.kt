@@ -66,9 +66,24 @@ class MainActivity : AppCompatActivity() {
         val dialogView = layoutInflater.inflate(R.layout.pokemon_details, null)
         val imageView: ImageView = dialogView.findViewById(R.id.dialog_pokemon_image)
         val nameTextView: TextView = dialogView.findViewById(R.id.dialog_pokemon_name)
+        val heightTextView: TextView = dialogView.findViewById(R.id.dialog_pokemon_height)
+        val weightTextView: TextView = dialogView.findViewById(R.id.dialog_pokemon_weight)
+        val typesTextView: TextView = dialogView.findViewById(R.id.dialog_pokemon_types)
+        val abilitiesTextView: TextView = dialogView.findViewById(R.id.dialog_pokemon_abilities)
 
 
         nameTextView.text = pokemon.name
+        heightTextView.text = getString(R.string.pokemon_height, pokemon.height)
+        weightTextView.text = getString(R.string.pokemon_weight, pokemon.weight)
+
+        // Concatena los nombres de los tipos
+        val types = pokemon.types?.joinToString(", ") { it.type.name }
+        typesTextView.text = getString(R.string.pokemon_types, types)
+
+        // Concatena los nombres de las habilidades
+        val abilities = pokemon?.abilities?.joinToString(", ") { it.ability.name }
+        abilitiesTextView.text = getString(R.string.pokemon_abilities, abilities)
+
 
         Glide.with(this).load(pokemon.sprites.front_default).into(imageView)
 
@@ -84,10 +99,16 @@ class MainActivity : AppCompatActivity() {
             pokemonList?.let {
                 pokemonAdapter.addPokemons(it)
                 it.forEach { pokemon ->
-                    PokemonRepository.getPokemonDetails(pokemon.id) { sprites ->
+                    PokemonRepository.getPokemonDetails(pokemon.id) { pokemonDetails ->
                         val index = pokemonList.indexOfFirst { it.id == pokemon.id }
-                        if (index != -1) {
-                            pokemonList[index].sprites = sprites ?: Sprites(front_default = null)
+                        if (index != -1 && pokemonDetails != null) {
+                            // Actualiza los detalles del Pokémon en la lista
+                            pokemonList[index].sprites = pokemonDetails.sprites
+                            pokemonList[index].height = pokemonDetails.height
+                            pokemonList[index].weight = pokemonDetails.weight
+                            pokemonList[index].types = pokemonDetails.types
+                            pokemonList[index].abilities = pokemonDetails.abilities
+
                             pokemonAdapter.notifyItemChanged(index)
                         }
                     }

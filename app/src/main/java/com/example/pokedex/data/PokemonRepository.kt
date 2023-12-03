@@ -18,7 +18,7 @@ object PokemonRepository {
             override fun onResponse(call: Call<PokemonResponse>, response: Response<PokemonResponse>) {
                 if (response.isSuccessful) {
                     val pokemonList = response.body()?.results?.map { summary ->
-                        Pokemon(id = extractIdFromUrl(summary.url), name = summary.name, sprites = Sprites(front_default = null))
+                        Pokemon(id = extractIdFromUrl(summary.url), name = summary.name, sprites = Sprites(front_default = null), height = 0, weight = 0, types = emptyList(), abilities = emptyList())
                     }
                     callback(pokemonList)
                 } else {
@@ -32,13 +32,12 @@ object PokemonRepository {
         })
     }
 
-
-    fun getPokemonDetails(id: Int, callback: (Sprites?) -> Unit) {
+    fun getPokemonDetails(id: Int, callback: (Pokemon?) -> Unit) {
         val call = pokemonService.getPokemon(id)
         call.enqueue(object : Callback<Pokemon> {
             override fun onResponse(call: Call<Pokemon>, response: Response<Pokemon>) {
                 if (response.isSuccessful) {
-                    callback(response.body()?.sprites)
+                    callback(response.body())
                 } else {
                     callback(null)
                 }
@@ -49,7 +48,6 @@ object PokemonRepository {
             }
         })
     }
-
 
     private fun extractIdFromUrl(url: String): Int {
         return url.dropLast(1).takeLastWhile { it.isDigit() }.toInt()
