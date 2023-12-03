@@ -10,13 +10,15 @@ import retrofit2.Callback
 import retrofit2.Response
 
 object PokemonRepository {
-    private val pokemonService = RetrofitClient.instance.create(PokemonService::class.java)
+    private val pokemonService = RetrofitClient.instance.create(PokemonService::class.java) // Inicialización del servicio para hacer llamadas de red con Retrofit
 
+    // Funcion que obtiene una lista de pokemones desde la API
     fun getPokemonList(limit: Int, offset: Int, callback: (List<Pokemon>?) -> Unit) {
-        val call = pokemonService.getPokemonList(limit, offset)
+        val call = pokemonService.getPokemonList(limit, offset) //lamada de red asincronica para obtener Pokemon
         call.enqueue(object : Callback<PokemonResponse> {
             override fun onResponse(call: Call<PokemonResponse>, response: Response<PokemonResponse>) {
                 if (response.isSuccessful) {
+                    // Mapea la respuesta a una lista de objetos Pokemon
                     val pokemonList = response.body()?.results?.map { summary ->
                         Pokemon(id = extractIdFromUrl(summary.url), name = summary.name, sprites = Sprites(front_default = null), height = 0, weight = 0, types = emptyList(), abilities = emptyList())
                     }
@@ -32,10 +34,11 @@ object PokemonRepository {
         })
     }
 
-    fun getPokemonDetails(id: Int, callback: (Pokemon?) -> Unit) {
+    fun getPokemonDetails(id: Int, callback: (Pokemon?) -> Unit) { // Obtiene detalles de pokemones
         val call = pokemonService.getPokemon(id)
         call.enqueue(object : Callback<Pokemon> {
             override fun onResponse(call: Call<Pokemon>, response: Response<Pokemon>) {
+                // Devuelve los detalles del pokemon si la respuesta es exitosa
                 if (response.isSuccessful) {
                     callback(response.body())
                 } else {
@@ -49,6 +52,7 @@ object PokemonRepository {
         })
     }
 
+    // Funcion auxiliar para extraer el ID del pokemon de la URL
     private fun extractIdFromUrl(url: String): Int {
         return url.dropLast(1).takeLastWhile { it.isDigit() }.toInt()
     }

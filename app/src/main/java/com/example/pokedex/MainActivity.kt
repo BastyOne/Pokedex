@@ -26,7 +26,7 @@ class MainActivity : AppCompatActivity() {
     private val handler = Handler(Looper.getMainLooper())
     private val updateTimeTask = object : Runnable {
         override fun run() {
-            clockTextView.text = ClockModule.getCurrentTime()
+            clockTextView.text = ClockModule.getCurrentTime() // Actualiza la hora cada minuto
             handler.postDelayed(this, 60000)
         }
     }
@@ -35,6 +35,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        // Configuración inicial de la vista RecyclerView y el adaptador
         val recyclerView: RecyclerView = findViewById(R.id.recyclerViewPokemonList)
         val searchView: SearchView = findViewById(R.id.searchView)
 
@@ -45,10 +46,11 @@ class MainActivity : AppCompatActivity() {
 
         recyclerView.layoutManager = LinearLayoutManager(this)
         pokemonAdapter = PokemonAdapter(mutableListOf()){
-            pokemon -> showPokemonDetailsDialog(pokemon)
+            pokemon -> showPokemonDetailsDialog(pokemon) // Logica para hacer click en el pokemon
         }
         recyclerView.adapter = pokemonAdapter
 
+        // Añade un scroll listener para cargar más elementos al hacer scroll (scroll infinito)
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
@@ -57,12 +59,14 @@ class MainActivity : AppCompatActivity() {
                 val lastVisibleItem = layoutManager.findLastVisibleItemPosition()
 
                 if (!isLoading && totalItemCount <= (lastVisibleItem + 5)) {
+                    // Carga mas pokemones al acercarse al final de la lista
                     loadMorePokemons()
                     isLoading = true
                 }
             }
         })
 
+        // Configura el SearchView para filtrar los resultados de búsqueda
         searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
 
@@ -74,15 +78,16 @@ class MainActivity : AppCompatActivity() {
                 return false
             }
         })
-
+        // Carga los primeros pokemones al iniciar la app
         loadMorePokemons()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        handler.removeCallbacks(updateTimeTask)
+        handler.removeCallbacks(updateTimeTask) // Evita fuga de memoria
     }
 
+    // Función para mostrar los detalles de un Pokémon específico en un diálogo
     private fun showPokemonDetailsDialog(pokemon: Pokemon) {
 
         val dialogView = layoutInflater.inflate(R.layout.pokemon_details, null)
@@ -103,7 +108,7 @@ class MainActivity : AppCompatActivity() {
         typesTextView.text = getString(R.string.pokemon_types, types)
 
         // Concatena los nombres de las habilidades
-        val abilities = pokemon?.abilities?.joinToString(", ") { it.ability.name }
+        val abilities = pokemon.abilities?.joinToString(", ") { it.ability.name }
         abilitiesTextView.text = getString(R.string.pokemon_abilities, abilities)
 
 
@@ -116,6 +121,7 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    // Funcion para cargar mas pokemones desde el repositorio
     private fun loadMorePokemons() {
         PokemonRepository.getPokemonList(limit, offset) { pokemonList ->
             pokemonList?.let {

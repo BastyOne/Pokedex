@@ -7,6 +7,7 @@ import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query
 
+// Define los servicios web de la API Pokemon
 interface PokemonService {
     @GET("pokemon/{id}")
     fun getPokemon(@Path("id") id: Int): Call<Pokemon>

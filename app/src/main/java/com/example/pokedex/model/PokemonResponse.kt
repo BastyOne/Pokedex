@@ -1,5 +1,6 @@
 package com.example.pokedex.model
 
+// Representa la respuesta de la API al solicitar la lista
 data class PokemonResponse(
     val count: Int,
     val next: String?,
